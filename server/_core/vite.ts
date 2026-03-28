@@ -7,7 +7,7 @@ import path from "path";
 export async function setupVite(app: Express, server: Server) {
   // ✅ استيراد vite فقط في development - لا يدخل في الـ bundle
   const { createServer: createViteServer } = await import("vite");
-  const { default: viteConfig } = await import("../../vite.config.js");
+const { default: viteConfig } = await import("../../vite.config.production.js");
 
   const serverOptions = {
     middlewareMode: true,
