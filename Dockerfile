@@ -20,6 +20,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+copy patches ./patches
+
 # Install pnpm
 RUN npm install -g pnpm
 
