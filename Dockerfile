@@ -36,7 +36,7 @@ RUN npm install -g pnpm
 # نسخ package files من builder
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 
-# نسخ patches من builder
+# نسخ patches من builder (ضروري للـ patched dependencies)
 COPY --from=builder /app/patches ./patches
 
 # تثبيت dependencies الإنتاجية فقط
@@ -45,18 +45,14 @@ RUN pnpm install --prod --frozen-lockfile
 # نسخ build النهائي من builder
 COPY --from=builder /app/dist ./dist
 
-# نسخ أي ملفات ضرورية مثل config أو assets
-COPY --from=builder /app/.env ./ # لو عندك env file
-
 # تعيين PORT
 ENV PORT=3000
 
 # Expose port
 EXPOSE 3000
 
-# Healthcheck مضبوط
-HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD curl -f http://localhost:$PORT/health || exit 1
+# Healthcheck مضبوط على /health
+فحص الصحة -- الفاصل الزمني=30 ثانية -- المهلة=10 ثوانٍ -- فترة البدء=15 ثانية -- عدد المحاولات=3
+CMD curl -f http://localhost:$PORT/health || exit 1
 
-# Start التطبيق
-CMD ["node", "dist/index.js"]
+لبدء التطبيق
