@@ -51,8 +51,7 @@ ENV PORT=3000
 # Expose port
 EXPOSE 3000
 
-# Healthcheck مضبوط على /health
-فحص الصحة -- الفاصل الزمني=30 ثانية -- المهلة=10 ثوانٍ -- فترة البدء=15 ثانية -- عدد المحاولات=3
-CMD curl -f http://localhost:$PORT/health || exit 1
+# Healthcheck on /health endpoint
+HEALTHCHECK --interval=30s --start-period=10s --timeout=15s --retries=3 \
+  CMD curl -f http://localhost:$PORT/health || exit 1
 
-لبدء التطبيق
