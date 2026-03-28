@@ -10,6 +10,46 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
+  // ✅ Simple login endpoint - بديل عن Manus OAuth
+  app.post("/api/oauth/login", async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+
+    // بيانات الدخول الافتراضية
+    const users: Record<string, { password: string; role: string; name: string; openId: string }> = {
+      admin: { password: "admin123", role: "admin", name: "المدير", openId: "admin-001" },
+      employee: { password: "emp123", role: "user", name: "موظف", openId: "emp-001" },
+    };
+
+    const user = users[username];
+    if (!user || user.password !== password) {
+      res.status(401).json({ error: "اسم المستخدم أو كلمة المرور غير صحيحة" });
+      return;
+    }
+
+    try {
+      await db.upsertUser({
+        openId: user.openId,
+        name: user.name,
+        email: null,
+        loginMethod: "local",
+        lastSignedIn: new Date(),
+      });
+
+      const sessionToken = await sdk.createSessionToken(user.openId, {
+        name: user.name,
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      res.json({ success: true, role: user.role });
+    } catch (error) {
+      console.error("[Login] Failed", error);
+      res.status(500).json({ error: "فشل تسجيل الدخول" });
+    }
+  });
+
+  // ✅ OAuth callback - للتوافق
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
@@ -43,7 +83,6 @@ export function registerOAuthRoutes(app: Express) {
 
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
-
       res.redirect(302, "/");
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
