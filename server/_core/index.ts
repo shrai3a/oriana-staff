@@ -15,9 +15,8 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-  // ✅ Healthcheck endpoint - مهم لـ Railway
+  // ✅ Healthcheck فقط - بدون route على /
   app.get("/health", (req, res) => res.json({ status: "ok" }));
-  app.get("/", (req, res) => res.json({ status: "ok" }));
 
   // OAuth
   registerOAuthRoutes(app);
@@ -38,7 +37,6 @@ async function startServer() {
     serveStatic(app);
   }
 
-  // ✅ PORT من Railway مباشرة بدون findAvailablePort
   const PORT = parseInt(process.env.PORT || "3000");
 
   server.listen(PORT, "0.0.0.0", () => {
