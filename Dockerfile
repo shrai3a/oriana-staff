@@ -1,49 +1,62 @@
+# ===========================
 # Build stage
+# ===========================
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# انسخ package files
 COPY package.json pnpm-lock.yaml* ./
 
-# Copy patches (ضروري قبل pnpm install)
+# انسخ فولدر patches (ضروري لـ pnpm patch)
 COPY patches ./patches
 
-# Install dependencies
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+# ثبت pnpm
+RUN npm install -g pnpm
 
-# Copy source code
+# ثبت dependencies كاملة
+RUN pnpm install --frozen-lockfile
+
+# انسخ باقي المشروع
 COPY . .
 
-# Build the application
+# Build المشروع (لو فيه build step)
 RUN pnpm build
 
+# ===========================
 # Production stage
+# ===========================
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Install pnpm
+# تثبيت pnpm
 RUN npm install -g pnpm
 
-# Copy package files from builder
+# نسخ package files من builder
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 
-# Copy patches from builder (ضروري إذا في patched dependencies)
+# نسخ patches من builder
 COPY --from=builder /app/patches ./patches
 
-# Install production dependencies only
+# تثبيت dependencies الإنتاجية فقط
 RUN pnpm install --prod --frozen-lockfile
 
-# Copy built application from builder
+# نسخ build النهائي من builder
 COPY --from=builder /app/dist ./dist
+
+# نسخ أي ملفات ضرورية مثل config أو assets
+COPY --from=builder /app/.env ./ # لو عندك env file
+
+# تعيين PORT
+ENV PORT=3000
 
 # Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+# Healthcheck مضبوط
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD curl -f http://localhost:$PORT/health || exit 1
 
-# Start the application
+# Start التطبيق
 CMD ["node", "dist/index.js"]
