@@ -15,7 +15,7 @@ COPY patches ./patches
 RUN npm install -g pnpm
 
 # ثبت dependencies كاملة
-RUN pnpm install --no-frozen-lockfile 1
+RUN pnpm install --no-frozen-lockfile
 
 # انسخ باقي المشروع
 COPY . .
