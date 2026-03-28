@@ -246,6 +246,90 @@ export default function LandingPage() {
     </div>
   );
 }
+
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 mb-16">
+          <Card className="p-8 bg-slate-800/50 border-slate-700 hover:border-blue-500 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                <Shield className="w-10 h-10 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">لوحة الإدارة</h2>
+                <p className="text-slate-400">الوصول إلى لوحة التحكم الإدارية الكاملة</p>
+              </div>
+              <div className="w-full space-y-3 text-sm text-slate-300">
+                <div className="flex items-center gap-2 justify-center">
+                  <Users size={16} className="text-blue-400" />
+                  <span>إدارة الموظفين والفروع</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <BarChart3 size={16} className="text-blue-400" />
+                  <span>التقارير والإحصائيات</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <DollarSign size={16} className="text-blue-400" />
+                  <span>إدارة الرواتب</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <MapPin size={16} className="text-blue-400" />
+                  <span>تتبع GPS المباشر</span>
+                </div>
+              </div>
+              <Button
+                onClick={() => setShowLogin("admin")}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                دخول الإدارة
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="p-8 bg-slate-800/50 border-slate-700 hover:border-green-500 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/20">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 bg-green-600/20 rounded-lg flex items-center justify-center">
+                <Users className="w-10 h-10 text-green-400" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">تطبيق الموظفين</h2>
+                <p className="text-slate-400">تسجيل الحضور والانصراف وعرض الإحصائيات</p>
+              </div>
+              <div className="w-full space-y-3 text-sm text-slate-300">
+                <div className="flex items-center gap-2 justify-center">
+                  <Clock size={16} className="text-green-400" />
+                  <span>تسجيل الحضور والانصراف</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <MapPin size={16} className="text-green-400" />
+                  <span>تسجيل الموقع والصورة</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <BarChart3 size={16} className="text-green-400" />
+                  <span>عرض الإحصائيات</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <DollarSign size={16} className="text-green-400" />
+                  <span>عرض الراتب والإجازات</span>
+                </div>
+              </div>
+              <Button
+                onClick={() => setShowLogin("employee")}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                دخول الموظفين
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <footer className="border-t border-slate-700 bg-slate-900/50 mt-20">
+        <div className="max-w-7xl mx-auto px-4 py-8 text-center text-slate-400">
+          <p>© 2026 Oriana Staff. جميع الحقوق محفوظة.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
 import React, { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
