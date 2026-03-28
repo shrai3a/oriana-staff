@@ -63,3 +63,18 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
+import express from 'express';
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// =============================
+// أضف هذا فقط للـ Healthcheck
+// =============================
+app.get('/health', (req, res) => res.send('OK'));
+
+// =============================
+// باقي الكود الأصلي موجود كما هو
+// =============================
+// ... existing routes, middlewares, etc.
+
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
