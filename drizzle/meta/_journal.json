@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1774647416679,
+      "tag": "0000_flippant_dust",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1774647628910,
+      "tag": "0001_light_black_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1774657573576,
+      "tag": "0002_fine_hemingway",
+      "breakpoints": true
+    }
+  ]
+}
