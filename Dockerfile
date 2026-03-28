@@ -6,6 +6,9 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
 
+# Copy patches (ضروري قبل pnpm install)
+COPY patches ./patches
+
 # Install dependencies
 RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
@@ -20,13 +23,14 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-copy patches ./patches
-
 # Install pnpm
 RUN npm install -g pnpm
 
 # Copy package files from builder
-COPY package.json pnpm-lock.yaml* ./
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
+
+# Copy patches from builder (ضروري إذا في patched dependencies)
+COPY --from=builder /app/patches ./patches
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
