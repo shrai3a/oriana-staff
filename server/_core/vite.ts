@@ -5,9 +5,8 @@ import { nanoid } from "nanoid";
 import path from "path";
 
 export async function setupVite(app: Express, server: Server) {
-  // ✅ استيراد vite فقط في development - لا يدخل في الـ bundle
   const { createServer: createViteServer } = await import("vite");
-const { default: viteConfig } = await import("../../vite.config.production.js");
+  const { default: viteConfig } = await import("../../vite.config.production.js");
 
   const serverOptions = {
     middlewareMode: true,
@@ -47,10 +46,7 @@ const { default: viteConfig } = await import("../../vite.config.production.js");
 }
 
 export function serveStatic(app: Express) {
-  const distPath =
-    process.env.NODE_ENV === "development"
-      ? path.resolve(import.meta.dirname, "../..", "dist", "public")
-      : path.resolve(import.meta.dirname, "public");
+  const distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {
     console.error(
@@ -58,9 +54,16 @@ export function serveStatic(app: Express) {
     );
   }
 
+  // ✅ serve static files
   app.use(express.static(distPath));
 
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  // ✅ catch-all - إرجاع index.html لكل route غير موجود (React Router)
+  app.use("*", (req, res) => {
+    const indexPath = path.resolve(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send("Build not found");
+    }
   });
 }
