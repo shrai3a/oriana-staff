@@ -31,11 +31,8 @@ function LoginModal({
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
-      if (res.ok) {
-        onSuccess();
-      } else {
-        setError(data.error || "فشل تسجيل الدخول");
-      }
+      if (res.ok) onSuccess();
+      else setError(data.error || "فشل تسجيل الدخول");
     } catch {
       setError("حدث خطأ، حاول مرة أخرى");
     } finally {
@@ -49,51 +46,18 @@ function LoginModal({
         <h2 className="text-xl font-bold text-white mb-6 text-center">
           {role === "admin" ? "دخول الإدارة" : "دخول الموظفين"}
         </h2>
+
         <div className="space-y-4">
-          <div>
-            <label className="text-sm text-slate-400 mb-1 block">اسم المستخدم</label>
-            <Input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white"
-              placeholder={role === "admin" ? "admin" : "employee"}
-              dir="ltr"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-slate-400 mb-1 block">كلمة المرور</label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white"
-              placeholder="••••••"
-              dir="ltr"
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            />
-          </div>
-          {error && (
-            <p className="text-red-400 text-sm text-center">{error}</p>
-          )}
-          <div className="text-xs text-slate-500 text-center">
-            {role === "admin" ? "admin / admin123" : "employee / emp123"}
-          </div>
-          <Button
-            onClick={handleLogin}
-            disabled={loading}
-            className={
-              role === "admin"
-                ? "w-full bg-blue-600 hover:bg-blue-700"
-                : "w-full bg-green-600 hover:bg-green-700"
-            }
-          >
-            {loading ? <Loader2 className="animate-spin" size={18} /> : "دخول"}
+          <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+          <Button onClick={handleLogin} disabled={loading}>
+            {loading ? <Loader2 className="animate-spin" /> : "دخول"}
           </Button>
-          <Button
-            variant="ghost"
-            onClick={onClose}
-            className="w-full text-slate-400"
-          >
+
+          <Button variant="ghost" onClick={onClose}>
             إلغاء
           </Button>
         </div>
@@ -105,6 +69,36 @@ function LoginModal({
 export default function LandingPage() {
   const { user, loading, refresh } = useAuth();
   const [, navigate] = useLocation();
+  const [showLogin, setShowLogin] = useState<"admin" | "employee" | null>(null);
+
+  React.useEffect(() => {
+    if (!loading && user) {
+      navigate(user.role === "admin" ? "/admin" : "/employee/checkin");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) return <Loader2 className="animate-spin" />;
+
+  if (user) return null;
+
+  return (
+    <div>
+      {showLogin && (
+        <LoginModal
+          role={showLogin}
+          onClose={() => setShowLogin(null)}
+          onSuccess={() => {
+            refresh();
+            setShowLogin(null);
+          }}
+        />
+      )}
+
+      <button onClick={() => setShowLogin("admin")}>Admin</button>
+      <button onClick={() => setShowLogin("employee")}>Employee</button>
+    </div>
+  );
+}  const [, navigate] = useLocation();
   const [showLogin, setShowLogin] = useState<"admin" | "employee" | null>(null);
 
   React.useEffect(() => {
