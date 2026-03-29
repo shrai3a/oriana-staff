@@ -30,32 +30,16 @@ function Router() {
 
   return (
     <Switch>
-      <Route path={"/"} component={LandingPage} />
-      
-      {/* Admin Routes */}
-      {user?.role === "admin" && (
-        <>
-          <Route path={"/admin"} component={AdminDashboard} />
-          <Route path={"/admin/employees"} component={EmployeesManagement} />
-          <Route path={"/admin/branches"} component={BranchesManagement} />
-          <Route path={"/admin/attendance"} component={AttendanceManagement} />
-          <Route path={"/admin/gps"} component={GPSTracking} />
-          <Route path={"/admin/reports"} component={ReportsAndAnalytics} />
-          <Route path={"/admin/payroll"} component={PayrollManagement} />
-          <Route path={"/admin/settings"} component={() => <div>Settings Page</div>} />
-        </>
-      )}
-
-      {/* Employee Routes */}
-      {user?.role === "user" && (
-        <>
-          <Route path={"/employee/checkin"} component={EmployeeCheckIn} />
-          <Route path={"/employee/profile"} component={EmployeeProfile} />
-        </>
-      )}
-
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      <Route path="/" component={LandingPage} />
+      <Route path="/admin" component={user?.role === "admin" ? AdminDashboard : LandingPage} />
+      <Route path="/admin/employees" component={user?.role === "admin" ? EmployeesManagement : LandingPage} />
+      <Route path="/admin/branches" component={user?.role === "admin" ? BranchesManagement : LandingPage} />
+      <Route path="/admin/attendance" component={user?.role === "admin" ? AttendanceManagement : LandingPage} />
+      <Route path="/admin/gps" component={user?.role === "admin" ? GPSTracking : LandingPage} />
+      <Route path="/admin/reports" component={user?.role === "admin" ? ReportsAndAnalytics : LandingPage} />
+      <Route path="/admin/payroll" component={user?.role === "admin" ? PayrollManagement : LandingPage} />
+      <Route path="/employee/checkin" component={user?.role === "user" ? EmployeeCheckIn : LandingPage} />
+      <Route path="/employee/profile" component={user?.role === "user" ? EmployeeProfile : LandingPage} />
       <Route component={NotFound} />
     </Switch>
   );
