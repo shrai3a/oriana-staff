@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
@@ -25,7 +24,7 @@ function LoginModal({ role, onClose }: { role: "admin" | "employee"; onClose: ()
       });
       const data = await res.json();
       if (res.ok) {
-        window.location.reload();
+        window.location.href = role === "admin" ? "/admin" : "/employee/checkin";
       } else {
         setError(data.error || "فشل تسجيل الدخول");
       }
@@ -70,7 +69,11 @@ export default function LandingPage() {
 
   React.useEffect(() => {
     if (!loading && user) {
-      navigate(user.role === "admin" ? "/admin" : "/employee/checkin");
+      if (user.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/employee/checkin";
+      }
     }
   }, [user, loading]);
 
