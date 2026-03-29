@@ -10,12 +10,11 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
-  // ✅ Simple login endpoint - بديل عن Manus OAuth
+  // ✅ Simple login endpoint
   app.post("/api/oauth/login", async (req: Request, res: Response) => {
     const { username, password } = req.body;
 
-    // بيانات الدخول الافتراضية
-    const users: Record<string, { password: string; role: string; name: string; openId: string }> = {
+    const users: Record<string, { password: string; role: "admin" | "user"; name: string; openId: string }> = {
       admin: { password: "admin123", role: "admin", name: "المدير", openId: "admin-001" },
       employee: { password: "emp123", role: "user", name: "موظف", openId: "emp-001" },
     };
@@ -27,12 +26,14 @@ export function registerOAuthRoutes(app: Express) {
     }
 
     try {
+      // ✅ تحديد الـ role مباشرة في قاعدة البيانات
       await db.upsertUser({
         openId: user.openId,
         name: user.name,
         email: null,
         loginMethod: "local",
         lastSignedIn: new Date(),
+        role: user.role,
       });
 
       const sessionToken = await sdk.createSessionToken(user.openId, {
@@ -49,7 +50,7 @@ export function registerOAuthRoutes(app: Express) {
     }
   });
 
-  // ✅ OAuth callback - للتوافق
+  // OAuth callback
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
