@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
-import { Menu, X, LogOut, Settings, Home, Users, MapPin, BarChart3, Clock, Navigation, DollarSign, Loader2 } from "lucide-react";
+import { Menu, X, LogOut, Settings, Home, Users, MapPin, BarChart3, Clock, Navigation, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -11,7 +11,17 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [, navigate] = useLocation();
-  const { user, logout, loading } = useAuth({ redirectOnUnauthenticated: false });
+
+  const { data: user } = trpc.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      window.location.href = "/";
+    },
+  });
 
   const navItems = [
     { label: "لوحة التحكم", icon: Home, href: "/admin" },
@@ -26,34 +36,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      await logout();
-      window.location.href = "/";
+      await logoutMutation.mutateAsync();
       toast.success("تم تسجيل الخروج بنجاح");
-    } catch (error) {
-      toast.error("حدث خطأ في تسجيل الخروج");
+    } catch {
+      window.location.href = "/";
     }
   };
 
-  // ✅ انتظر تحميل الـ user
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
-      </div>
-    );
-  }
-
-  // ✅ لو مش admin ارجع للصفحة الرئيسية
-  if (!user || user.role !== "admin") {
-    window.location.href = "/";
-    return null;
-  }
-
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
       <aside className={`${sidebarOpen ? "w-64" : "w-20"} bg-card border-r border-border transition-all duration-300 flex flex-col`}>
-        {/* Logo */}
         <div className="p-6 border-b border-border flex items-center justify-between">
           {sidebarOpen && (
             <div className="flex items-center gap-2">
@@ -68,7 +60,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -86,7 +77,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           })}
         </nav>
 
-        {/* User Profile */}
         <div className="p-4 border-t border-border">
           <div className={`flex items-center gap-3 ${!sidebarOpen && "justify-center"}`}>
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
@@ -94,8 +84,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
             {sidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user?.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{user?.email || "admin"}</p>
+                <p className="text-sm font-medium truncate">{user?.name || "Admin"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email || ""}</p>
               </div>
             )}
           </div>
@@ -109,7 +99,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Oriana Staff</h1>
@@ -126,4 +115,3 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     </div>
   );
 }
-
