@@ -14,36 +14,6 @@ import ReportsAndAnalytics from "./pages/ReportsAndAnalytics";
 import PayrollManagement from "./pages/PayrollManagement";
 import EmployeeCheckIn from "./pages/EmployeeCheckIn";
 import EmployeeProfile from "./pages/EmployeeProfile";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Loader2 } from "lucide-react";
-
-function Router() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="animate-spin" size={32} />
-      </div>
-    );
-  }
-
-  return (
-    <Switch>
-      <Route path="/" component={LandingPage} />
-      <Route path="/admin" component={user?.role === "admin" ? AdminDashboard : LandingPage} />
-      <Route path="/admin/employees" component={user?.role === "admin" ? EmployeesManagement : LandingPage} />
-      <Route path="/admin/branches" component={user?.role === "admin" ? BranchesManagement : LandingPage} />
-      <Route path="/admin/attendance" component={user?.role === "admin" ? AttendanceManagement : LandingPage} />
-      <Route path="/admin/gps" component={user?.role === "admin" ? GPSTracking : LandingPage} />
-      <Route path="/admin/reports" component={user?.role === "admin" ? ReportsAndAnalytics : LandingPage} />
-      <Route path="/admin/payroll" component={user?.role === "admin" ? PayrollManagement : LandingPage} />
-      <Route path="/employee/checkin" component={user?.role === "user" ? EmployeeCheckIn : LandingPage} />
-      <Route path="/employee/profile" component={user?.role === "user" ? EmployeeProfile : LandingPage} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
 
 function App() {
   return (
@@ -51,7 +21,19 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <Switch>
+            <Route path="/" component={LandingPage} />
+            <Route path="/admin" component={AdminDashboard} />
+            <Route path="/admin/employees" component={EmployeesManagement} />
+            <Route path="/admin/branches" component={BranchesManagement} />
+            <Route path="/admin/attendance" component={AttendanceManagement} />
+            <Route path="/admin/gps" component={GPSTracking} />
+            <Route path="/admin/reports" component={ReportsAndAnalytics} />
+            <Route path="/admin/payroll" component={PayrollManagement} />
+            <Route path="/employee/checkin" component={EmployeeCheckIn} />
+            <Route path="/employee/profile" component={EmployeeProfile} />
+            <Route component={NotFound} />
+          </Switch>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
