@@ -126,27 +126,4 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     </div>
   );
 }
-          </button>
-        </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Oriana Staff</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {new Date().toLocaleDateString("ar-SA")}
-            </span>
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <div className="flex-1 overflow-auto p-6">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
-}
